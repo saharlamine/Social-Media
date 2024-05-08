@@ -39,6 +39,8 @@ const initialValuesRegister = {
   location: "",
   occupation: "",
   picture: "",
+  Linkedin:"https://www.linkedin.com/feed/",
+  twitter:""
 };
 
 const initialValuesLogin = {
@@ -159,6 +161,26 @@ const Form = () => {
                   name="location"
                   error={Boolean(touched.location) && Boolean(errors.location)}
                   helperText={touched.location && errors.location}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <TextField
+                  label="twitter"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.twitter}
+                  name="twitter"
+                  error={Boolean(touched.twitter) && Boolean(errors.twitter)}
+                  helperText={touched.twitter && errors.twitter}
+                  sx={{ gridColumn: "span 4" }}
+                />
+                <TextField
+                  label="Linkedin"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.Linkedin}
+                  name="Linkedin"
+                  error={Boolean(touched.Linkedin) && Boolean(errors.Linkedin)}
+                  helperText={touched.Linkedin && errors.Linkedin}
                   sx={{ gridColumn: "span 4" }}
                 />
                 <TextField

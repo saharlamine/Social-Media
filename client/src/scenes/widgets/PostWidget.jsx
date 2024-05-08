@@ -11,7 +11,7 @@ import WidgetWrapper from "components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPost } from "state";
-
+import { SendOutlined } from "@mui/icons-material";
 const PostWidget = ({
   postId,
   postUserId,
@@ -24,6 +24,7 @@ const PostWidget = ({
   comments,
 }) => {
   const [isComments, setIsComments] = useState(false);
+  const [newComment, setNewComment] = useState(""); // Track the new comment
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
@@ -45,6 +46,32 @@ const PostWidget = ({
     });
     const updatedPost = await response.json();
     dispatch(setPost({ post: updatedPost }));
+  };
+
+  const addComment = async () => {
+    const res = await fetch(`http://localhost:3001/users/${loggedInUserId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    const response = await fetch(
+      `http://localhost:3001/posts/${postId}/comment`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: loggedInUserId,
+          username: data.firstName + " " + data.lastName, // Assuming you're passing the username
+          text: newComment,
+        }),
+      }
+    );
+    const updatedPost = await response.json();
+    dispatch(setPost({ post: updatedPost }));
+    setNewComment(""); // Clear the new comment input after adding
   };
 
   return (
@@ -87,22 +114,46 @@ const PostWidget = ({
             <Typography>{comments.length}</Typography>
           </FlexBetween>
         </FlexBetween>
-
-        <IconButton>
-          <ShareOutlined />
-        </IconButton>
       </FlexBetween>
       {isComments && (
         <Box mt="0.5rem">
+          {/* Render existing comments */}
           {comments.map((comment, i) => (
             <Box key={`${name}-${i}`}>
               <Divider />
               <Typography sx={{ color: main, m: "0.5rem 0", pl: "1rem" }}>
-                {comment}
+                <strong>{comment.username}</strong>: {comment.text}{" "}
+                {/* Render comment username and text */}
               </Typography>
             </Box>
           ))}
           <Divider />
+          {/* Input for new comment */}
+          <Box mt="0.5rem" sx={{ display: "flex", alignItems: "center" }}>
+            <input
+              type="text"
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              style={{
+                flex: "1",
+                padding: "0.5rem",
+                borderRadius: "0.25rem",
+                border: "1px solid #ccc",
+              }}
+            />
+            <IconButton
+              style={{
+                marginLeft: "0.5rem",
+                backgroundColor: "#007bff",
+                color: "#fff",
+                borderRadius: "0.25rem",
+              }}
+              onClick={addComment}
+            >
+              <SendOutlined />
+            </IconButton>
+          </Box>
         </Box>
       )}
     </WidgetWrapper>

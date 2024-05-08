@@ -1,5 +1,39 @@
 import User from "../models/User.js";
-
+export const getUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.find({
+      $or: [
+        { firstName: { $regex: username, $options: 'i' } },
+        { lastName: { $regex: username, $options: 'i' } },
+        { location: { $regex: username, $options: 'i' } },
+        { email: { $regex: username, $options: 'i' } }
+      ]
+    }); 
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+export const getUserByemail = async (req, res) => {
+  try {
+    const { username } = req.params;
+    const user = await User.find({
+      $or: [
+        { email: username}
+      ]
+    }); 
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 /* READ */
 export const getUser = async (req, res) => {
   try {
